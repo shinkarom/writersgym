@@ -16,7 +16,7 @@ spaceind = 0
 parser = argparse.ArgumentParser()
 parser.add_argument("filename")
 parser.add_argument("-n", default=20, help="number of words in context", type=int)
-parser.add_argument("--mode", choices=["hero","gm"], default="hero")
+parser.add_argument("--mode", choices=["hero","gm","revgm"], default="hero")
 args = parser.parse_args()
 
 f = open(args.filename,"r")
@@ -41,8 +41,10 @@ def randomize_vars():
 	origwordnum = random.randrange(0, len(lines[origlinenum]))
 	if args.mode == "hero":
 		spaceind = random.randrange(0, args.n)
-	else:
+	elif args.mode == "gm":
 		spaceind = args.n - 1
+	else:
+		spaceind = 0
 	linenum = origlinenum
 	wordnum = origwordnum	
 
@@ -52,6 +54,15 @@ def forward_vars():
 	if origwordnum > len(lines[origlinenum]):
 		origlinenum += 1
 		origwordnum = 0
+	wordnum = origwordnum
+	linenum = origlinenum
+
+def backward_vars():
+	global origlinenum, origwordnum, wordnum, linenum
+	origwordnum -= 1
+	if origwordnum == -1 :
+		origlinenum -= 1
+		origwordnum = len(lines[origlinenum])-1
 	wordnum = origwordnum
 	linenum = origlinenum
 
@@ -96,6 +107,8 @@ while True:
 	screen_clear()
 	if args.mode == "hero":
 		randomize_vars()
-	else: 
+	elif args.mode == "gm": 
 		forward_vars()	
+	else:
+		backward_vars()
 	one_round()
