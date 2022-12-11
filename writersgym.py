@@ -96,13 +96,16 @@ def one_round():
 	print()
 	input("Press ENTER to continue...")
 	
-randomize_vars()
-while True:
-	screen_clear()
-	if args.mode == "hero":
-		randomize_vars()
-	elif args.mode == "gm": 
-		forward_vars(args.c)	
-	else:
-		backward_vars(args.c)
-	one_round()
+try:
+	randomize_vars()
+	while True:
+		screen_clear()
+		if args.mode == "hero":
+			randomize_vars()
+		elif args.mode == "gm": 
+			forward_vars(args.c)	
+		else:
+			backward_vars(args.c)
+		one_round()
+except KeyboardInterrupt:
+	print("\n\nThanks for visiting the writer's gym!\n")
