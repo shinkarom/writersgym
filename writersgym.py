@@ -15,9 +15,10 @@ spaceind = 0
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename")
-parser.add_argument("-n", default=20, help="number of words in context", type=int)
+parser.add_argument("-cl", default=20, help="context length in words", type=int)
 parser.add_argument("--mode", choices=["hero","gm","revgm"], default="hero")
-parser.add_argument("-c",help="move interval in gm mode",type=int, default=1)
+parser.add_argument("-ma",help="move amount in gm mode",type=int, default=1)
+parser.add_argument("-n",help="number of words to guess",type=int,default=1)
 args = parser.parse_args()
 
 f = open(args.filename,"r")
@@ -41,19 +42,20 @@ def randomize_vars():
 	origlinenum = random.randrange(0, len(lines))
 	origwordnum = random.randrange(0, len(lines[origlinenum]))
 	if args.mode == "hero":
-		spaceind = random.randrange(0, args.n)
+		spaceind = random.randrange(0, args.cl-args.n+1)
 	elif args.mode == "gm":
-		spaceind = args.n - 1
+		spaceind = args.cl - args.n
 	else:
 		spaceind = 0
 	linenum = origlinenum
 	wordnum = origwordnum	
 
 def forward_vars(amount):
+	print(f"<{amount}>")
 	global origlinenum, origwordnum, wordnum, linenum
 	origwordnum += amount
 	while origwordnum >= len(lines[origlinenum]):
-		origwordnum += len(lines[origlinenum])
+		origwordnum += len(lines[origlinenum]) - origwordnum
 		origlinenum += 1
 	wordnum = origwordnum
 	linenum = origlinenum
@@ -72,12 +74,12 @@ def one_round():
 	print(delim)
 	line = lines[linenum]
 	exc = ""
-	spaceword = ""
+	spacewords = []
 	i = 0
-	while i < args.n:
-		if i == spaceind:
-			exc += "[..]"
-			spaceword = line[wordnum]
+	while i < args.cl:
+		if i >= spaceind and i < spaceind+args.n:
+			exc += f"[.{i-spaceind+1}.]"
+			spacewords.append(line[wordnum])
 		else:
 			exc += line[wordnum]
 		i+=1
@@ -93,7 +95,7 @@ def one_round():
 	print(delim)
 	print()
 	w = input("> ")
-	print("= "+spaceword)
+	print("= "+" ".join(spacewords))
 	print()
 	input("Press ENTER to continue...")
 	
@@ -104,9 +106,9 @@ try:
 		if args.mode == "hero":
 			randomize_vars()
 		elif args.mode == "gm": 
-			forward_vars(args.c)	
+			forward_vars(args.ma+args.n-1)	
 		else:
-			backward_vars(args.c)
+			backward_vars(args.ma+args.n-1)
 		one_round()
 except KeyboardInterrupt:
 	print("\n\nThanks for visiting the writer's gym!\n")
