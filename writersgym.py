@@ -20,6 +20,7 @@ parser.add_argument("--mode", choices=["hero","gm","revgm"], default="hero")
 parser.add_argument("--ma",help="move amount in gm mode",type=int, default=1)
 parser.add_argument("-n",help="number of words to guess",type=int,default=1)
 parser.add_argument("--hint",help="show hint of results",action="store_true")
+parser.add_argument("--merge",help="merge omitted words",action="store_true")
 args = parser.parse_args()
 
 f = open(args.filename,"r")
@@ -78,21 +79,36 @@ def one_round():
 	exc = ""
 	spacewords = []
 	i = 0
+	j = 0
 	while i < args.cl:
 		if i >= spaceind and i < spaceind+args.n:
-			exc += f"[..{i-spaceind+1}]"
+			j = i-spaceind+1
+			if args.merge:
+				if j == 1:
+					exc += f"[.{args.n}.]"
+			else:
+				exc += f"[..{j}]"
 			spacewords.append(line[wordnum])
 		else:
 			exc += line[wordnum]
+			j = 0
 		i+=1
 		wordnum += 1
 		if wordnum >= len(line):
-			exc += "\n"
+			if args.merge:
+				if j != 0:
+					exc += "\n"
+			else:
+				exc += "\n"
 			linenum += 1
 			wordnum = 0
 			line = lines[linenum]
 		else:
-			exc += " "
+			if args.merge:
+				if j <= 1:
+					exc += " "
+			else:
+				exc += " "
 	print(exc)
 	print(delim+"\n")
 	print()
