@@ -5,7 +5,7 @@ import argparse
 import random
 
 lines = []
-delim = "-" * 80
+delim = "_" * 80
 
 origlinenum = 0
 origwordnum = 0
@@ -73,7 +73,7 @@ def backward_vars(amount):
 
 def one_round():
 	global origlinenum, origwordnum, wordnum, linenum
-	print(delim)
+	print(delim+"\n")
 	line = lines[linenum]
 	exc = ""
 	spacewords = []
@@ -94,7 +94,7 @@ def one_round():
 		else:
 			exc += " "
 	print(exc)
-	print(delim)
+	print(delim+"\n")
 	print()
 	if args.hint:
 		hints = spacewords.copy()
