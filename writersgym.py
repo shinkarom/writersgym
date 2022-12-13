@@ -19,6 +19,7 @@ parser.add_argument("--cl", default=20, help="context length in words", type=int
 parser.add_argument("--mode", choices=["hero","gm","revgm"], default="hero")
 parser.add_argument("--ma",help="move amount in gm mode",type=int, default=1)
 parser.add_argument("-n",help="number of words to guess",type=int,default=1)
+parser.add_argument("--hint",help="show hint of results",action="store_true")
 args = parser.parse_args()
 
 f = open(args.filename,"r")
@@ -95,6 +96,12 @@ def one_round():
 	print(exc)
 	print(delim)
 	print()
+	if args.hint:
+		hints = spacewords.copy()
+		random.shuffle(hints)
+		hintstr = " ".join(hints).replace("\n","")
+		print(f"Hint: {hintstr}")
+		print()
 	w = input("> ")
 	print("= "+" ".join(spacewords))
 	print()
