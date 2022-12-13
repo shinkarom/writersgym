@@ -86,6 +86,7 @@ def one_round():
 			exc += "\n"
 			linenum += 1
 			wordnum = 0
+			line = lines[linenum]
 		else:
 			exc += " "
 	print(exc)
