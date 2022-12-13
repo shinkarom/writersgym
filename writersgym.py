@@ -15,9 +15,9 @@ spaceind = 0
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename")
-parser.add_argument("-cl", default=20, help="context length in words", type=int)
+parser.add_argument("--cl", default=20, help="context length in words", type=int)
 parser.add_argument("--mode", choices=["hero","gm","revgm"], default="hero")
-parser.add_argument("-ma",help="move amount in gm mode",type=int, default=1)
+parser.add_argument("--ma",help="move amount in gm mode",type=int, default=1)
 parser.add_argument("-n",help="number of words to guess",type=int,default=1)
 args = parser.parse_args()
 
@@ -51,21 +51,22 @@ def randomize_vars():
 	wordnum = origwordnum	
 
 def forward_vars(amount):
-	print(f"<{amount}>")
 	global origlinenum, origwordnum, wordnum, linenum
-	origwordnum += amount
-	while origwordnum >= len(lines[origlinenum]):
-		origwordnum += len(lines[origlinenum]) - origwordnum
-		origlinenum += 1
+	for _ in range(0,amount):
+		origwordnum += 1
+		if origwordnum >= len(lines[origlinenum]):
+			origlinenum +=1
+			origwordnum = 0
 	wordnum = origwordnum
 	linenum = origlinenum
 
 def backward_vars(amount):
 	global origlinenum, origwordnum, wordnum, linenum
-	origwordnum -= amount
-	while origwordnum < 0 :
-		origwordnum += len(lines[origlinenum])
-		origlinenum -= 1	
+	for _ in range(0, amount):
+		origwordnum -= 1
+		if origwordnum < 0:
+			origlinenum -= 1
+			origwordnum = len(lines[origlinenum]) - 1
 	wordnum = origwordnum
 	linenum = origlinenum
 
@@ -78,7 +79,7 @@ def one_round():
 	i = 0
 	while i < args.cl:
 		if i >= spaceind and i < spaceind+args.n:
-			exc += f"[.{i-spaceind+1}.]"
+			exc += f"[..{i-spaceind+1}]"
 			spacewords.append(line[wordnum])
 		else:
 			exc += line[wordnum]
