@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import os
+import sys
 import argparse
 import random
 
@@ -20,7 +21,6 @@ parser.add_argument("--mode", choices=["hero","gm","revgm"], default="hero")
 parser.add_argument("--ma",help="move amount in gm mode",type=int, default=1)
 parser.add_argument("-n",help="number of words to guess",type=int,default=1)
 parser.add_argument("--hint",help="show hint of results",action="store_true")
-parser.add_argument("--merge",help="merge omitted words",action="store_true")
 args = parser.parse_args()
 
 f = open(args.filename,"r")
@@ -44,7 +44,7 @@ def randomize_vars():
 	origlinenum = random.randrange(0, len(lines))
 	origwordnum = random.randrange(0, len(lines[origlinenum]))
 	if args.mode == "hero":
-		spaceind = random.randrange(0, args.cl-args.n+1)
+		spaceind = random.randrange(1, args.cl-args.n)
 	elif args.mode == "gm":
 		spaceind = args.cl - args.n
 	else:
@@ -83,11 +83,7 @@ def one_round():
 	while i < args.cl:
 		if i >= spaceind and i < spaceind+args.n:
 			j = i-spaceind+1
-			if args.merge:
-				if j == 1:
-					exc += f"[.{args.n}.]"
-			else:
-				exc += f"[..{j}]"
+			exc += f"[..{j}]"
 			spacewords.append(line[wordnum])
 		else:
 			exc += line[wordnum]
@@ -95,20 +91,12 @@ def one_round():
 		i+=1
 		wordnum += 1
 		if wordnum >= len(line):
-			if args.merge:
-				if j != 0:
-					exc += "\n"
-			else:
-				exc += "\n"
+			exc += "\n"
 			linenum += 1
 			wordnum = 0
 			line = lines[linenum]
 		else:
-			if args.merge:
-				if j <= 1:
-					exc += " "
-			else:
-				exc += " "
+			exc += " "
 	print(exc)
 	print(delim+"\n")
 	print()
@@ -116,7 +104,8 @@ def one_round():
 		hints = spacewords.copy()
 		random.shuffle(hints)
 		hintstr = " ".join(hints).replace("\n","")
-		print(f"Hint: {hintstr}")
+		input("Press ENTER to reveal hint...")
+		print(f"\033[1AHint: {hintstr}\033[K")
 		print()
 	w = input("> ")
 	print("= "+" ".join(spacewords))
